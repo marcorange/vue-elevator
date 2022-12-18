@@ -1,26 +1,57 @@
 <template>
-  <img alt="Vue logo" src="./assets/logo.png">
-  <HelloWorld msg="Welcome to Your Vue.js App"/>
+    <div class="container">
+        <CabineCells
+            :elevalorPosition="currentLevel"
+            :totalLevels="numberOfLevels"
+        />
+
+        <CallButtons :call="callElevator" :totalLevels="numberOfLevels" />
+    </div>
 </template>
 
 <script>
-import HelloWorld from './components/HelloWorld.vue'
+import CabineCells from "./components/CabineCells";
+import CallButtons from "./components/CallButtons";
+
 
 export default {
-  name: 'App',
-  components: {
-    HelloWorld
-  }
-}
+    name: "App",
+    data() {
+        return {
+            currentLevel: 1,
+            numberOfLevels: 7,
+        };
+    },
+    components: {
+        CabineCells,
+        CallButtons
+    },
+    computed: {
+        computedTop: function () {
+            return this.currentLevel;
+        },
+    },
+    methods: {
+        callElevator(destLevel) {
+            let interval = setInterval(() => {
+                if (this.currentLevel === destLevel) {
+                    clearInterval(interval);
+                    return;
+                }
+                else if (this.currentLevel < destLevel) {
+                    this.currentLevel += 1;
+                }
+                else {
+                  this.currentLevel -= 1;
+                }
+            }, 1000);
+        },
+    },
+};
 </script>
 
 <style>
-#app {
-  font-family: Avenir, Helvetica, Arial, sans-serif;
-  -webkit-font-smoothing: antialiased;
-  -moz-osx-font-smoothing: grayscale;
-  text-align: center;
-  color: #2c3e50;
-  margin-top: 60px;
+.container {
+    display: flex;
 }
 </style>
