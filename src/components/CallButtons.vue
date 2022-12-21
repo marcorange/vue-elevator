@@ -1,7 +1,9 @@
 <template>
     <div class="container">
         <div v-for="levelNumber in totalLevels" :key="levelNumber">
-            <SingleCallButton @click="call(levelNumber)" :levelNumber="levelNumber"/>
+            <SingleCallButton @click="click(levelNumber)" :levelNumber="levelNumber" 
+            :buttonQueue="buttonQueue"
+            :id="levelNumber"/>
         </div>
     </div>
 </template>
@@ -13,7 +15,7 @@ import SingleCallButton from "./SingleCallButton";
         components: {
             SingleCallButton
         },
-        props: ['totalLevels', 'call']
+        props: ['totalLevels', 'click', 'buttonQueue']
     }
 </script>
 
