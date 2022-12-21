@@ -28,7 +28,6 @@ export default {
     border-radius: 10%;
     text-align: center;
     color: #540375;
-    text-shadow: 1px 1px 2px white;
     font-weight: bold;
 }
 
