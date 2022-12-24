@@ -73,7 +73,7 @@ export default {
                 this.executionQueue.push(destinationLevel);
 
                 if (this.executionQueue.length <= this.numberOfElevators) {
-                    this.$refs.allElevators.handleCall(destinationLevel);
+                    this.$refs.allElevators.handleNewCall(destinationLevel);
                 }
                 else {
                     this.$refs.allElevators.addToQueue(destinationLevel);

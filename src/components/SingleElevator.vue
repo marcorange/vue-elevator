@@ -24,35 +24,17 @@ export default {
             },
             finishedCallAnimation: false,
             isBusy: false,
-            currentCall: Number
         };
     },
     components: {
         SingleCabineCell,
     },
     props: ["id", "numberOfLevels"],
-    computed: {
-        directionIndicator() {
-            if (this.elevatorPosition < this.currentCall) {
-                return "⬆";
-            }
-            else if (this.elevatorPosition > this.currentCall) {
-                return "⬇";
-            }
-            else {
-                return null;
-            }
-        }
-    },
     watch: {
         elevatorPosition() {
             localStorage.setItem("elevator-" + this.id, this.elevatorPosition)
         },
         
-        currentCall() {
-            localStorage.setItem("currentCall", this.currentCall)  
-        },
-
         isBusy() {
             localStorage.setItem("state", this.isBusy)
         }
@@ -73,7 +55,6 @@ export default {
         endCall(currentCall) {
             this.displayElevatorState(true);
             this.isBusy = false;
-            this.currentCall = null;
     
             this.$parent.nextCall(currentCall);
         },
@@ -87,21 +68,17 @@ export default {
         },
 
         initNewCall(destinationLevel) {
-            this.currentCall = destinationLevel;
+            this.isBusy = true;
 
             this.movingDirection.level = destinationLevel;
-            this.movingDirection.direction = this.directionIndicator;
-
-            this.isBusy = true;
+            this.movingDirection.direction = this.elevatorPosition < destinationLevel ? "⬆"  : "⬇"
 
             let interval = setInterval(() => {
                 if (this.elevatorPosition === destinationLevel) {
                     this.indicateFinish(interval, destinationLevel);
                 } else if (this.elevatorPosition < destinationLevel) {
-                    this.movingDirection.direction = "⬆";
                     this.elevatorPosition += 1;
                 } else if (this.elevatorPosition > destinationLevel) {
-                    this.movingDirection.direction = "⬇";
                     this.elevatorPosition -= 1;
                 } else {
                     return;
@@ -124,16 +101,9 @@ export default {
         if (localStorage["elevator-" + this.id]) {
             let position = JSON.parse(localStorage.getItem("elevator-" + this.id))
             this.elevatorPosition = position
-
         }
         if (localStorage.state) {
             this.isBusy = JSON.parse(localStorage.getItem("state"))
-        }
-        if (localStorage.currentCall) {
-            this.currentCall = JSON.parse(localStorage.getItem("currentCall"))
-            if (this.currentCall) {
-                this.initNewCall(this.currentCall)
-            }
         }
     },
 };
