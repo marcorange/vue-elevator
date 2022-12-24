@@ -21,19 +21,42 @@ export default {
             pendingCalls: [],
         };
     },
+    watch: {
+        executingCalls: {
+            deep: true,
+
+            handler() {
+                localStorage.setItem(
+                    "executingCalls",
+                    JSON.stringify(this.executingCalls)
+                );
+            },
+        },
+
+        pendingCalls: {
+            deep: true,
+
+            handler() {
+                localStorage.setItem(
+                    "pendingCalls",
+                    JSON.stringify(this.pendingCalls)
+                );
+            },
+        },
+    },
     components: {
         SingleElevator,
     },
-
     props: ["numberOfElevators", "numberOfLevels", "executionQueue"],
+
     methods: {
         getElevator(level) {
-            let indexOfNearest = this.getNearestElevator(level);
+            let nearestElevator = this.getNearestElevator(level);
             if (
-                indexOfNearest &&
-                !this.$refs.elevators[indexOfNearest].elevatorIsBusy()
+                nearestElevator &&
+                !nearestElevator.elevatorIsBusy()
             ) {
-                return this.$refs.elevators[indexOfNearest];
+                return nearestElevator;
             } else return null;
         },
 
@@ -45,12 +68,12 @@ export default {
                     let elevatorPosition =
                         this.$refs.elevators[i].getPosition();
                     let distance = Math.abs(level - elevatorPosition);
-                    distances.push({ distance: distance, elevatorIndex: i });
+                    distances.push({ distance: distance, elevator: this.$refs.elevators[i] });
                 }
             }
             if (distances.length > 0) {
                 distances.sort((a, b) => a.distance - b.distance);
-                return distances[0].elevatorIndex;
+                return distances[0].elevator;
             }
             else return null;
         },
@@ -73,9 +96,11 @@ export default {
 
         handleCall(call) {
             let elevator = this.getElevator(call);
-
             if (elevator && !this.areElevatorsAtLevel(call)) {
-                this.executingCalls.push(call);
+
+                if(!this.executingCalls.includes(call)) {
+                    this.executingCalls.push(call);
+                }
                 if (this.pendingCalls.length > 0) {
                     this.pendingCalls.shift();
                 }
@@ -109,6 +134,22 @@ export default {
             }
         },
     },
+
+    mounted() {
+        if (localStorage.pendingCalls) {
+            this.pendingCalls = JSON.parse(
+                localStorage.getItem("pendingCalls")
+            );
+        }
+        if (localStorage.executingCalls) {
+            
+
+            this.executingCalls = JSON.parse(
+                localStorage.getItem("executingCalls")
+            );
+        }
+    }
+
 };
 </script>
 

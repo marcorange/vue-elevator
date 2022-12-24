@@ -1,11 +1,16 @@
 # vue-elevator
 
+## Configuration
+```
+Select number of elevators and number of levels in: src/config.js
+```
+
 ## Project setup
 ```
 npm install
 ```
 
-### Compiles and hot-reloads for development
+### Compiles
 ```
 npm run start
 ```

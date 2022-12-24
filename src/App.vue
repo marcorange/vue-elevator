@@ -19,7 +19,7 @@
 </template>
 
 <script>
-
+import { numberOfLevels, numberOfElevators } from "./config.js"
 import AllElevators from "./components/AllElevators";
 import CallButtons from "./components/CallButtons";
 /* eslint-disable no-unused-vars */
@@ -28,8 +28,8 @@ export default {
     name: "App",
     data() {
         return {
-            numberOfLevels: 5,
-            numberOfElevators: 3,
+            numberOfLevels: numberOfLevels,
+            numberOfElevators: numberOfElevators,
 
             executionQueue: [],
         };
@@ -38,26 +38,23 @@ export default {
         AllElevators,
         CallButtons,
     },
-    // watch: {
-    //     currentLevel() {
-    //         localStorage.currentLevel = this.currentLevel;
-    //     },
+    watch: {
+        executionQueue: {
+            deep: true,
 
-    //     executionQueue: {
-    //         deep: true,
-
-    //         handler() {
-    //             localStorage.setItem(
-    //                 "executionQueue",
-    //                 JSON.stringify(this.executionQueue)
-    //             );
-    //         },
-    //     },
-    // },
+            handler() {
+                localStorage.setItem(
+                    "executionQueue",
+                    JSON.stringify(this.executionQueue)
+                );
+            },
+        },
+    },
     methods: {
-        // resetValues() {
-        //     //start params
-        // },
+        resetValues() {
+            localStorage.clear();
+            window.location.reload();
+        },
 
         removeFromMainQueue(finishedCall) {
             if (this.executionQueue.length === 1) {
@@ -85,19 +82,13 @@ export default {
         },
     },
 
-    // mounted() {
-    //     if (localStorage.currentLevel) {
-    //         this.currentLevel = Number(localStorage.currentLevel);
-    //     }
-
-    //     if (localStorage.executionQueue) {
-    //         this.executionQueue = JSON.parse(
-    //             localStorage.getItem("executionQueue")
-    //         );
-    //         this.executionQueue.unshift(this.executionQueue[0]);
-    //         this.nextCall();
-    //     }
-    // },
+    mounted() {
+        if (localStorage.executionQueue) {
+            this.executionQueue = JSON.parse(
+                localStorage.getItem("executionQueue")
+            );
+        }
+    },
 };
 </script>
 

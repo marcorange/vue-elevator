@@ -23,18 +23,40 @@ export default {
                 direction: "🟢",
             },
             finishedCallAnimation: false,
-            isBusy: false
+            isBusy: false,
+            currentCall: Number
         };
     },
     components: {
         SingleCabineCell,
     },
     props: ["id", "numberOfLevels"],
-    // watch: {
-    //     elevatorPosition() {
-    //         localStorage.elevatorPosition = this.elevatorPosition;
-    //     },
-    // },
+    computed: {
+        directionIndicator() {
+            if (this.elevatorPosition < this.currentCall) {
+                return "⬆";
+            }
+            else if (this.elevatorPosition > this.currentCall) {
+                return "⬇";
+            }
+            else {
+                return null;
+            }
+        }
+    },
+    watch: {
+        elevatorPosition() {
+            localStorage.setItem("elevator-" + this.id, this.elevatorPosition)
+        },
+        
+        currentCall() {
+            localStorage.setItem("currentCall", this.currentCall)  
+        },
+
+        isBusy() {
+            localStorage.setItem("state", this.isBusy)
+        }
+    },
     methods: {
         displayElevatorState(isReady) {
             this.movingDirection.level = null;
@@ -51,7 +73,8 @@ export default {
         endCall(currentCall) {
             this.displayElevatorState(true);
             this.isBusy = false;
-
+            this.currentCall = null;
+    
             this.$parent.nextCall(currentCall);
         },
 
@@ -64,7 +87,11 @@ export default {
         },
 
         initNewCall(destinationLevel) {
+            this.currentCall = destinationLevel;
+
             this.movingDirection.level = destinationLevel;
+            this.movingDirection.direction = this.directionIndicator;
+
             this.isBusy = true;
 
             let interval = setInterval(() => {
@@ -90,11 +117,24 @@ export default {
             return this.elevatorPosition
         },
 
-        // mounted() {
-        //     if (localStorage.elevatorPosition) {
-        //         this.elevatorPosition = Number(localStorage.elevatorPosition);
-        //     }
-        // },
+        
+    },
+
+    mounted() {
+        if (localStorage["elevator-" + this.id]) {
+            let position = JSON.parse(localStorage.getItem("elevator-" + this.id))
+            this.elevatorPosition = position
+
+        }
+        if (localStorage.state) {
+            this.isBusy = JSON.parse(localStorage.getItem("state"))
+        }
+        if (localStorage.currentCall) {
+            this.currentCall = JSON.parse(localStorage.getItem("currentCall"))
+            if (this.currentCall) {
+                this.initNewCall(this.currentCall)
+            }
+        }
     },
 };
 </script>
