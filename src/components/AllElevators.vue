@@ -18,7 +18,7 @@ export default {
     data() {
         return {
             executingCalls: [],
-            pendingCalls: []
+            pendingCalls: [],
         };
     },
     components: {
@@ -27,24 +27,44 @@ export default {
 
     props: ["numberOfElevators", "numberOfLevels", "executionQueue"],
     methods: {
+        getElevator(level) {
+            let indexOfNearest = this.getNearestElevator(level);
+            if (
+                indexOfNearest &&
+                !this.$refs.elevators[indexOfNearest].elevatorIsBusy()
+            ) {
+                return this.$refs.elevators[indexOfNearest];
+            } else return null;
+        },
 
-        getFreeElevator() {
+        getNearestElevator(level) {
+            let distances = [];
+
             for (let i in this.$refs.elevators) {
                 if (!this.$refs.elevators[i].elevatorIsBusy()) {
-                    return this.$refs.elevators[i];
+                    let elevatorPosition =
+                        this.$refs.elevators[i].getPosition();
+                    let distance = Math.abs(level - elevatorPosition);
+                    distances.push({ distance: distance, elevatorIndex: i });
                 }
             }
-            return;
+            if (distances.length > 0) {
+                distances.sort((a, b) => a.distance - b.distance);
+                return distances[0].elevatorIndex;
+            }
+            else return null;
         },
 
         addToQueue(call) {
-            this.pendingCalls.push(call)
+            this.pendingCalls.push(call);
         },
 
         areElevatorsAtLevel(level) {
             for (let i in this.$refs.elevators) {
-                if (level === this.$refs.elevators[i].getPosition()
-                && !this.$refs.elevators[i].elevatorIsBusy()) {
+                if (
+                    level === this.$refs.elevators[i].getPosition() &&
+                    !this.$refs.elevators[i].elevatorIsBusy()
+                ) {
                     return true;
                 }
             }
@@ -52,20 +72,19 @@ export default {
         },
 
         handleCall(call) {
-            let elevator = this.getFreeElevator();
+            let elevator = this.getElevator(call);
 
             if (elevator && !this.areElevatorsAtLevel(call)) {
                 this.executingCalls.push(call);
                 if (this.pendingCalls.length > 0) {
                     this.pendingCalls.shift();
                 }
-                elevator.initNewCall(call)
-            }
-            else if (elevator && this.areElevatorsAtLevel(call)) {
+                elevator.initNewCall(call);
+            } else if (elevator && this.areElevatorsAtLevel(call)) {
                 return this.$parent.removeFromMainQueue(call);
             }
             else if (!elevator) {
-                this.addToQueue(call)
+                this.addToQueue(call);
             }
         },
 
@@ -77,13 +96,12 @@ export default {
                     return call !== finishedCall;
                 });
             }
-        },  
+        },
 
         nextCall(currentCall) {
-            this.$parent.removeFromMainQueue(currentCall)
+            this.$parent.removeFromMainQueue(currentCall);
             this.removeFromExecuting(currentCall);
 
-            
             if (this.pendingCalls.length > 0) {
                 this.handleCall(this.pendingCalls[0]);
             } else {

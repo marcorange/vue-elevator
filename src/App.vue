@@ -29,7 +29,7 @@ export default {
     data() {
         return {
             numberOfLevels: 5,
-            numberOfElevators: 5,
+            numberOfElevators: 3,
 
             executionQueue: [],
         };
