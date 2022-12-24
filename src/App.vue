@@ -1,23 +1,26 @@
 <template>
-    <button @click="resetValues">RESET VALUES</button>
-    <div class="container">
-        <CabineCells
-            :elevalorPosition="currentLevel"
-            :totalLevels="numberOfLevels"
-            :direction="movingDirection"
-            :finishedCallAnimation="finishedCallAnimation"
-        />
+    <div v-cloak>
+        <button @click="resetValues">RESET VALUES</button>
+        <div class="main-container">
+            <AllElevators
+                ref="allElevators"
+                :numberOfElevators="numberOfElevators"
+                :numberOfLevels="numberOfLevels"
+                :executionQueue="executionQueue"
+            />
 
-        <CallButtons
-            :click="addToQueue"
-            :totalLevels="numberOfLevels"
-            :buttonQueue="executionQueue"
-        />
+            <CallButtons
+                :click="addToQueue"
+                :totalLevels="numberOfLevels"
+                :buttonQueue="executionQueue"
+            />
+        </div>
     </div>
 </template>
 
 <script>
-import CabineCells from "./components/CabineCells";
+
+import AllElevators from "./components/AllElevators";
 import CallButtons from "./components/CallButtons";
 /* eslint-disable no-unused-vars */
 
@@ -25,143 +28,97 @@ export default {
     name: "App",
     data() {
         return {
-            currentLevel: 1,
             numberOfLevels: 5,
+            numberOfElevators: 5,
+
             executionQueue: [],
-            movingDirection: {
-                level: null,
-                direction: "🟢",
-            },
-            finishedCallAnimation: false,
         };
     },
     components: {
-        CabineCells,
+        AllElevators,
         CallButtons,
     },
-    watch: {
-        currentLevel() {
-            localStorage.currentLevel = this.currentLevel;
-        },
+    // watch: {
+    //     currentLevel() {
+    //         localStorage.currentLevel = this.currentLevel;
+    //     },
 
-        executionQueue: {
-            deep: true,
+    //     executionQueue: {
+    //         deep: true,
 
-            handler() {
-                localStorage.setItem(
-                    "executionQueue",
-                    JSON.stringify(this.executionQueue)
-                );
-            },
-        },
-    },
+    //         handler() {
+    //             localStorage.setItem(
+    //                 "executionQueue",
+    //                 JSON.stringify(this.executionQueue)
+    //             );
+    //         },
+    //     },
+    // },
     methods: {
+        // resetValues() {
+        //     //start params
+        // },
 
-        resetValues() {
-          //later defaults or start params
-          this.currentLevel = 1;
-          this.executionQueue = [];
-          this.movingDirection.level = null;
-          this.movingDirection.direction = "🟢";
-          this.finishedCallAnimation = false;
-        },
-
-
-        displayElevatorState(isReady) {
-            this.movingDirection.level = null;
-
-            if (isReady) {
-                this.finishedCallAnimation = false;
-                this.movingDirection.direction = "🟢";
+        removeFromMainQueue(finishedCall) {
+            if (this.executionQueue.length === 1) {
+                this.executionQueue.shift();
             } else {
-                this.finishedCallAnimation = true;
-                this.movingDirection.direction = "🔴";
+                this.executionQueue = this.executionQueue.filter((call) => {
+                    return call !== finishedCall;
+                })
             }
+
         },
 
-        nextCall() {
-            this.displayElevatorState(true);
+        addToQueue(destinationLevel) {
 
-            this.executionQueue.shift();
+            if (!this.executionQueue.includes(destinationLevel)) {
+                this.executionQueue.push(destinationLevel);
 
-            if (this.executionQueue.length > 0) {
-                return this.initNewCall();
-            } else {
-                return;
-            }
-        },
-
-        finishCall(interval) {
-            clearInterval(interval);
-
-            this.displayElevatorState(false);
-
-            setTimeout(this.nextCall, 3000);
-        },
-
-        initNewCall() {
-            let interval = setInterval(() => {
-                this.movingDirection.level = this.executionQueue[0];
-                if (this.currentLevel === this.executionQueue[0]) {
-                    this.finishCall(interval);
-                } else if (this.currentLevel < this.executionQueue[0]) {
-                    this.movingDirection.direction = "⬆";
-                    this.currentLevel += 1;
-                } else if (this.currentLevel > this.executionQueue[0]) {
-                    this.movingDirection.direction = "⬇";
-                    this.currentLevel -= 1;
-                } else {
-                    return;
+                if (this.executionQueue.length <= this.numberOfElevators) {
+                    this.$refs.allElevators.handleCall(destinationLevel);
                 }
-            }, 1000);
-        },
-
-        addToQueue(destLevel) {
-            if (!this.executionQueue.includes(destLevel)) {
-                if (
-                    destLevel !== this.currentLevel ||
-                    (destLevel === this.currentLevel &&
-                        this.movingDirection.level)
-                ) {
-                    this.executionQueue.push(destLevel);
-                    if (this.executionQueue.length === 1) {
-                        this.initNewCall();
-                    }
+                else {
+                    this.$refs.allElevators.addToQueue(destinationLevel);
                 }
             }
         },
     },
 
-    mounted() {
-        if (localStorage.currentLevel) {
-            this.currentLevel = Number(localStorage.currentLevel);
-        }
+    // mounted() {
+    //     if (localStorage.currentLevel) {
+    //         this.currentLevel = Number(localStorage.currentLevel);
+    //     }
 
-        if (localStorage.executionQueue) {
-            this.executionQueue = JSON.parse(
-                localStorage.getItem("executionQueue")
-            );
-            this.executionQueue.unshift(this.executionQueue[0]);
-            this.nextCall();
-        }
-    },
+    //     if (localStorage.executionQueue) {
+    //         this.executionQueue = JSON.parse(
+    //             localStorage.getItem("executionQueue")
+    //         );
+    //         this.executionQueue.unshift(this.executionQueue[0]);
+    //         this.nextCall();
+    //     }
+    // },
 };
 </script>
 
 <style scoped>
-button {
-  font-weight: bold;
-  font-size: 0.7rem;
-  background-color: rgb(11, 194, 11);
-  border-style: none;
-  border-radius: 100%;
-  width: 4rem;
-  height: 2rem;
-  margin-left: 3%;
-  margin-bottom: 3%
+[v-cloak] {
+    display: none;
 }
 
-.container {
+button {
+    font-weight: bold;
+    font-size: 0.7rem;
+    background-color: rgb(11, 194, 11);
+    border-style: none;
+    border-radius: 100%;
+    width: 4rem;
+    height: 2rem;
+    margin-left: 3%;
+    margin-bottom: 3%;
+}
+
+.main-container {
     display: flex;
 }
 </style>

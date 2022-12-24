@@ -1,5 +1,5 @@
 <template>
-    <div class="container">
+    <div class="buttons-container">
         <div v-for="levelNumber in totalLevels" :key="levelNumber">
             <SingleCallButton @click="click(levelNumber)" :levelNumber="levelNumber" 
             :buttonQueue="buttonQueue"
@@ -19,8 +19,8 @@ import SingleCallButton from "./SingleCallButton";
     }
 </script>
 
-<style scoped>
-.container {
+<style>
+.buttons-container {
     display: flex;
     flex-direction: column-reverse;
 }

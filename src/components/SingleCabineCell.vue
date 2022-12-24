@@ -1,11 +1,11 @@
 <template>
     <div
-        v-if="flexOrder === elevalorPosition"
+        v-if="flexOrder === elevatorPosition"
         :class="finishedCallAnimation ? 'cell animated' : 'cell'"
         :style="{ order: flexOrder, 'background-color': '#ff4800' }"
     >
-        {{ direction.level }}
-        {{ direction.direction }}
+        {{ movingDirection.level }}
+        {{ movingDirection.direction }}
     </div>
     <div v-else class="cell" :style="{ order: flexOrder }">
     </div>
@@ -14,7 +14,7 @@
 <script>
 export default {
     name: "SingleCabineCell",
-    props: ["flexOrder", "elevalorPosition", 'direction', 'finishedCallAnimation'],
+    props: ["flexOrder", "elevatorPosition", 'movingDirection', 'finishedCallAnimation'],
 };
 </script>
 
