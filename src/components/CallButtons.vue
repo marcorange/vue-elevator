@@ -1,9 +1,10 @@
 <template>
     <div class="buttons-container">
-        <div v-for="levelNumber in totalLevels" :key="levelNumber">
-            <SingleCallButton @click="click(levelNumber)" :levelNumber="levelNumber" 
-            :buttonQueue="buttonQueue"
-            :id="levelNumber"/>
+        <div v-for="level in numberOfLevels" :key="level">
+            <SingleCallButton @click="addToQueueClick(level)" 
+            :executionQueue="executionQueue"
+            :executingCalls="executingCalls"
+            :level="level"/>
         </div>
     </div>
 </template>
@@ -15,7 +16,8 @@ import SingleCallButton from "./SingleCallButton";
         components: {
             SingleCallButton
         },
-        props: ['totalLevels', 'click', 'buttonQueue']
+        
+        props: ['numberOfLevels', 'addToQueueClick', 'executionQueue', 'executingCalls']
     }
 </script>
 

@@ -14,7 +14,7 @@
 <script>
 export default {
     name: "SingleCabineCell",
-    props: ["flexOrder", "elevatorPosition", 'movingDirection', 'finishedCallAnimation'],
+    props: ['flexOrder', 'elevatorPosition', 'movingDirection', 'finishedCallAnimation'],
 };
 </script>
 

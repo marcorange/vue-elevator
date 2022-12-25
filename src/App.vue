@@ -10,9 +10,10 @@
             />
 
             <CallButtons
-                :click="addToQueue"
-                :totalLevels="numberOfLevels"
-                :buttonQueue="executionQueue"
+                :addToQueueClick="addToQueue"
+                :numberOfLevels="numberOfLevels"
+                :executionQueue="executionQueue"
+                :executingCalls="executingCalls"
             />
         </div>
     </div>
@@ -27,7 +28,7 @@ import CallButtons from "./components/CallButtons";
 export default {
     name: "App",
     data() {
-        return {
+        return  {
             numberOfLevels: numberOfLevels,
             numberOfElevators: numberOfElevators,
 
@@ -37,6 +38,15 @@ export default {
     components: {
         AllElevators,
         CallButtons,
+    },
+    computed: {
+        executingCalls() {
+            let executingCalls = []
+            for (let i = 0; i < this.numberOfElevators; i++) {
+                executingCalls.push(this.executionQueue[i])
+            }
+            return executingCalls
+        }
     },
     watch: {
         executionQueue: {
@@ -51,6 +61,7 @@ export default {
         },
     },
     methods: {
+
         resetValues() {
             localStorage.clear();
             window.location.reload();
@@ -64,11 +75,9 @@ export default {
                     return call !== finishedCall;
                 })
             }
-
         },
 
         addToQueue(destinationLevel) {
-
             if (!this.executionQueue.includes(destinationLevel)) {
                 this.executionQueue.push(destinationLevel);
 

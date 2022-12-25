@@ -29,7 +29,7 @@ export default {
     components: {
         SingleCabineCell,
     },
-    props: ["id", "numberOfLevels"],
+    props: ['id', 'numberOfLevels'],
     watch: {
         elevatorPosition() {
             localStorage.setItem("elevator-" + this.id, this.elevatorPosition)
@@ -71,7 +71,7 @@ export default {
             this.isBusy = true;
 
             this.movingDirection.level = destinationLevel;
-            this.movingDirection.direction = this.elevatorPosition < destinationLevel ? "⬆"  : "⬇"
+            this.movingDirection.direction = (this.elevatorPosition < destinationLevel) ? "⬆" : (this.elevatorPosition > destinationLevel) ? "⬇" : ""
 
             let interval = setInterval(() => {
                 if (this.elevatorPosition === destinationLevel) {

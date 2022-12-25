@@ -64,7 +64,6 @@ export default {
     props: ["numberOfElevators", "numberOfLevels", "executionQueue"],
 
     methods: {
-
         getElevatorIndex(level) {
             let nearestElevatorIndex = this.getNearestElevator(level);
             if (
@@ -109,6 +108,7 @@ export default {
             return false;
         },
 
+        //compare handleNewCall
         continueExecutingCall() {
             for(let i in this.executingCalls) {
                 let elevatorIndex = this.executingElevators[i]
@@ -128,6 +128,8 @@ export default {
         handleNewCall(call) {
             let elevatorIndex = this.getElevatorIndex(call);
             if (elevatorIndex && !this.areElevatorsAtLevel(call)) {
+
+                //unite in one function
                 this.executingCalls.push(call);
                 this.executingElevators.push(elevatorIndex);
 

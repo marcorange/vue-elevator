@@ -1,14 +1,15 @@
 <template>
     <button 
-        :class="buttonQueue[0] === id ? 'is-next' : ''"
-        :style="buttonQueue.includes(id) ? { 'background-color': 'rgb(11, 194, 11)'} : ''">{{levelNumber}}
+        :class="executingCalls.includes(level) ? 'is-next' : ''"
+        :style="executionQueue.includes(level) ? { 'background-color': 'rgb(11, 194, 11)'} : ''">
+        {{level}}
     </button>
 </template>
 
 <script>
     export default {
         name: 'SingleCallButton',
-        props: ['levelNumber', 'buttonQueue', 'id']
+        props: ['level', 'executionQueue', 'executingCalls']
     }    
 </script>
 
