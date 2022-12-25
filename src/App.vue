@@ -67,7 +67,7 @@ export default {
             window.location.reload();
         },
 
-        removeFromMainQueue(finishedCall) {
+        removeFromQueue(finishedCall) {
             if (this.executionQueue.length === 1) {
                 this.executionQueue.shift();
             } else {

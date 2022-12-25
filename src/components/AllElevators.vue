@@ -17,10 +17,8 @@ export default {
     name: "AllElevators",
     data() {
         return {
-            executingCalls: [],
             pendingCalls: [],
-            executingElevators: []
-            
+            executingCalls: []
         };
     },
 
@@ -32,17 +30,6 @@ export default {
                 localStorage.setItem(
                     "executingCalls",
                     JSON.stringify(this.executingCalls)
-                );
-            },
-        },
-
-        executingElevators: {
-            deep: true,
-
-            handler() {
-                localStorage.setItem(
-                    "executingElevators",
-                    JSON.stringify(this.executingElevators)
                 );
             },
         },
@@ -108,59 +95,62 @@ export default {
             return false;
         },
 
-        //compare handleNewCall
         continueExecutingCall() {
             for(let i in this.executingCalls) {
-                let elevatorIndex = this.executingElevators[i]
-                let call = this.executingCalls[i]
+                let elevatorIndex = this.executingCalls[i].byElevatorIndex;
+                let call = this.executingCalls[i].atLevel
 
                 if (elevatorIndex && !this.areElevatorsAtLevel(call)) {
                     this.$refs.elevators[elevatorIndex].initNewCall(call);
-                    
                 }
                 else if (elevatorIndex && this.areElevatorsAtLevel(call)) {
-                    return this.$parent.removeFromMainQueue(call);
+                    return this.removeCall(call);
                 }
-
             }
         },
 
-        handleNewCall(call) {
-            let elevatorIndex = this.getElevatorIndex(call);
-            if (elevatorIndex && !this.areElevatorsAtLevel(call)) {
-
-                //unite in one function
-                this.executingCalls.push(call);
-                this.executingElevators.push(elevatorIndex);
+        updateQueues(call, elevatorIndex) {
+                this.executingCalls.push({
+                    atLevel: call,
+                    byElevatorIndex: elevatorIndex
+                });
 
                 if (this.pendingCalls.length > 0) {
                     this.pendingCalls.shift();
                 }
+        },
 
+        handleNewCall(call) {
+            let elevatorIndex = this.getElevatorIndex(call);
+
+            if (elevatorIndex && !this.areElevatorsAtLevel(call)) {
+                this.updateQueues(call, elevatorIndex);
                 this.$refs.elevators[elevatorIndex].initNewCall(call);
             } else if (elevatorIndex && this.areElevatorsAtLevel(call)) {
-                return this.$parent.removeFromMainQueue(call);
+                return this.$parent.removeFromQueue(call);
             }
             else if (!elevatorIndex) {
                 this.addToQueue(call);
             }
         },
 
-        removeFromExecutingQueue(finishedCall) {
+        removeFromExecuting(finishedCall) {
             if (this.executingCalls.length === 1) {
                 this.executingCalls.shift();
-                this.executingElevators.shift()
             } else {
                 this.executingCalls = this.executingCalls.filter((call) => {
-                    return call !== finishedCall;
+                    return call.atLevel !== finishedCall;
                 });
-                
             }
         },
 
+        removeCall(currentCall) {
+            this.$parent.removeFromQueue(currentCall);
+            this.removeFromExecuting(currentCall);
+        },
+
         nextCall(currentCall) {
-            this.$parent.removeFromMainQueue(currentCall);
-            this.removeFromExecutingQueue(currentCall);
+            this.removeCall(currentCall)
 
             if (this.pendingCalls.length > 0) {
                 this.handleNewCall(this.pendingCalls[0]);
@@ -177,19 +167,12 @@ export default {
             );
         }
 
-        if (localStorage.executingElevators) {
-            this.executingElevators = JSON.parse(
-                localStorage.getItem("executingElevators")
-            );
-        }
-
-        if (localStorage.executingCalls) {
-            
+        if (localStorage.executingCalls) {       
             this.executingCalls = JSON.parse(
                 localStorage.getItem("executingCalls")
             );
 
-            if (this.executingCalls.length > 0 && this.executingElevators.length > 0) {
+            if (this.executingCalls.length > 0) {
                 this.continueExecutingCall()
             }
         }
